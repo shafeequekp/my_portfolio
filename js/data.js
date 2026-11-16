@@ -1,4 +1,11 @@
-const portfolioData = {
+/**
+ * Portfolio content store.
+ * Content is loaded from content.json at runtime so you can update your
+ * portfolio from the admin panel (admin.html) without touching code.
+ * If the fetch fails (offline / misconfigured), the embedded defaults below
+ * are used as a fallback.
+ */
+const DEFAULT_PORTFOLIO_DATA = {
     profile: {
         name: "Muhammed Shafeek",
         title: "Python Developer",
@@ -69,6 +76,34 @@ const portfolioData = {
     ]
 };
 
+let portfolioData = { ...DEFAULT_PORTFOLIO_DATA };
+
+/**
+ * Load portfolio content from content.json (cache-busted).
+ * Falls back to DEFAULT_PORTFOLIO_DATA on failure.
+ * @returns {Promise<object>}
+ */
+async function loadPortfolioData() {
+    try {
+        const response = await fetch(`content.json?v=${Date.now()}`, { cache: 'no-store' });
+        if (response.ok) {
+            const data = await response.json();
+            // Merge with defaults so missing keys never break rendering
+            portfolioData = {
+                profile: { ...DEFAULT_PORTFOLIO_DATA.profile, ...(data.profile || {}) },
+                skills: data.skills || DEFAULT_PORTFOLIO_DATA.skills,
+                experience: data.experience || DEFAULT_PORTFOLIO_DATA.experience,
+                projects: data.projects || DEFAULT_PORTFOLIO_DATA.projects
+            };
+        } else {
+            console.warn(`content.json returned ${response.status}. Using fallback data.`);
+        }
+    } catch (error) {
+        console.warn('Could not load content.json. Using fallback data.', error);
+    }
+    return portfolioData;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = portfolioData;
+    module.exports = { DEFAULT_PORTFOLIO_DATA, loadPortfolioData, get portfolioData() { return portfolioData; } };
 }

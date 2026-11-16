@@ -1,4 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load portfolio content from content.json (with fallback to defaults)
+    await loadPortfolioData();
+
     renderProfile();
     renderSkills();
     renderExperience();
