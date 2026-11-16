@@ -372,7 +372,7 @@
       if (token) {
         try {
           await loadContentFromGitHub();
-          renderAll();
+          this.renderAll();
           showDashboard();
         } catch (err) {
           showToast('Auth failed: ' + err.message, 'error');
@@ -392,7 +392,7 @@
         if (!token) throw new Error('Please enter your GitHub Personal Access Token.');
         persistToken($('remember').checked);
         await loadContentFromGitHub();
-        renderAll();
+        this.renderAll();
         showDashboard();
         showToast('Connected to GitHub. Content loaded from ' + FILE_PATH, 'success');
       } catch (err) {
@@ -412,7 +412,7 @@
     async refresh() {
       try {
         await loadContentFromGitHub();
-        renderAll();
+        this.renderAll();
         showToast('Refreshed from GitHub repo', 'success');
       } catch (err) {
         showToast('Refresh failed: ' + err.message, 'error');
@@ -433,13 +433,13 @@
       if (!content) return;
       const arr = content[section] || [];
       arr.push({});
-      renderAll();
+      this.renderAll();
     },
 
     removeRow(section, index) {
       if (!content) return;
       content[section].splice(index, 1);
-      renderAll();
+      this.renderAll();
     },
 
     collectProfile() {
@@ -488,7 +488,7 @@
           updated.projects = this.collectArray('projects', ['title', 'description', 'image', 'github', 'demo', 'technologies']);
         }
         await commitContent(updated, `chore(portfolio): update ${section} via admin panel`);
-        renderAll();
+        this.renderAll();
         showToast(`${section} saved and committed to ${cfg.repo}`, 'success');
       } catch (err) {
         showToast('Save failed: ' + err.message, 'error');
@@ -504,7 +504,7 @@
       try {
         const updated = JSON.parse($('raw-json').value);
         await commitContent(updated, 'chore(portfolio): update raw content.json via admin panel');
-        renderAll();
+        this.renderAll();
         showToast('Raw JSON saved and committed', 'success');
       } catch (err) {
         showToast('Invalid JSON or save failed: ' + err.message, 'error');
