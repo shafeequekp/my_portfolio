@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderProfile();
     renderSkills();
     renderExperience();
-    fetchGitHubProjects();
+    renderProjects(portfolioData.projects);
     setupThemeToggle();
     setupContactForm();
     setCurrentYear();
