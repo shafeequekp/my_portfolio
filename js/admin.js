@@ -243,6 +243,14 @@
         <button class="btn btn-primary" onclick="app.saveSection('profile')"><i class="fas fa-save me-1"></i> Save Profile</button>
         <span id="save-status-profile" class="text-small text-muted ms-2"></span>
       </div>
+      <hr class="my-3">
+      <div class="field-group">
+        <label class="field-label">Upload Resume PDF</label>
+        <input type="file" id="resume-upload" accept="application/pdf" class="form-control form-control-sm">
+        <div class="small text-muted">Max 25MB. Replaces <code>assets/resume.pdf</code> in your GitHub repo.</div>
+      </div>
+      <button class="btn btn-danger" onclick="app.uploadResumeFile()" id="btn-upload-resume"><i class="fas fa-upload me-1"></i> Upload Resume to GitHub</button>
+      <div id="resume-upload-status" class="small text-muted mt-2"></div>
     `;
   }
 
@@ -553,6 +561,68 @@
 
     loadRaw() {
       if (content) $('raw-json').value = JSON.stringify(content, null, 2);
+    },
+
+    async uploadResumeFile() {
+      const input = $('resume-upload');
+      const file = input.files[0];
+      if (!file) { showToast('Please select a PDF file first', 'error'); return; }
+      if (file.type !== 'application/pdf') { showToast('Please upload a PDF file', 'error'); return; }
+      if (file.size > 25 * 1024 * 1024) { showToast('File too large (max 25MB)', 'error'); return; }
+
+      const btn = $('btn-upload-resume');
+      const status = $('resume-upload-status');
+      setBtnLoading(btn, true);
+      status.textContent = 'Uploading to GitHub...';
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        const base64 = btoa(binary);
+
+        // Get current SHA if file exists
+        const fileApi = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/assets/resume.pdf?ref=${cfg.branch}`;
+        const headers = { ...authHeaders() };
+        let sha = null;
+        try {
+          const res = await fetch(fileApi, { headers });
+          if (res.ok) {
+            const data = await res.json();
+            sha = data.sha;
+          }
+        } catch { /* file may not exist yet */ }
+
+        const putPayload = {
+          message: `chore(portfolio): upload resume.pdf via admin panel`,
+          content: base64,
+          branch: cfg.branch,
+        };
+        if (sha) putPayload.sha = sha;
+
+        const putRes = await fetch(fileApi, {
+          method: 'PUT',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify(putPayload)
+        });
+
+        if (!putRes.ok) {
+          const errData = await putRes.json().catch(() => ({}));
+          throw new Error(errData.message || `GitHub upload failed (${putRes.status})`);
+        }
+
+        status.innerHTML = '<span style="color:var(--admin-success); font-weight:700;">Resume uploaded successfully!</span>';
+        input.value = '';
+        showToast('Resume uploaded to GitHub repo', 'success');
+      } catch (err) {
+        showToast('Upload failed: ' + err.message, 'error');
+        status.textContent = '';
+      } finally {
+        setBtnLoading(btn, false);
+      }
     }
   };
 
