@@ -171,20 +171,28 @@
   ],
   "projects": [
     {
-      "title": "Project 1",
-      "description": "A placeholder for your first project. Detailed description will come here.",
+      "title": "Microservices ETL Pipeline",
+      "description": "Built a scalable ETL pipeline using Python, Django, and Celery to process large volumes of data from multiple sources. Integrated with AWS S3 for storage, Redis for caching, and PostgreSQL for data warehousing. Containerized with Docker and deployed on AWS EC2 with CI/CD using GitHub Actions.",
       "image": "assets/project1.png",
       "github": "https://github.com/shafeequekp",
       "demo": "#",
-      "technologies": "Python, Django"
+      "technologies": "Python, Django, Celery, Redis, PostgreSQL, AWS, Docker, GitHub Actions"
     },
     {
-      "title": "Project 2",
-      "description": "A placeholder for your second project. Detailed description will come here.",
+      "title": "Django REST API Platform",
+      "description": "Developed a RESTful API platform using Django REST Framework with JWT authentication, role-based access control, and API documentation. Integrated with PostgreSQL database and deployed on AWS with Nginx and Gunicorn. Implemented monitoring and logging for production observability.",
       "image": "assets/project2.png",
       "github": "https://github.com/shafeequekp",
       "demo": "#",
-      "technologies": "Next.js, Tailwind"
+      "technologies": "Django, Django REST Framework, PostgreSQL, AWS, Nginx, Gunicorn, JWT"
+    },
+    {
+      "title": "Data Processing & Analytics Dashboard",
+      "description": "Created a data processing application using Python and Pandas to analyze and visualize business metrics. Built async task processing with Celery and Redis, containerized with Docker, and deployed to AWS. Includes automated reporting and data export features.",
+      "image": "assets/project-placeholder.png",
+      "github": "https://github.com/shafeequekp",
+      "demo": "#",
+      "technologies": "Python, Pandas, Celery, Redis, Docker, AWS, HTML5, Bootstrap"
     }
   ]
 }
