@@ -28,6 +28,7 @@
   let cfg = { ...DEFAULT_CONFIG };
   let fileSha = null;
   let content = null; // parsed content.json
+  let repos = []; // fetched GitHub repositories for the dropdown
 
   // ---------------- Auth helpers ----------------
   function loadSavedState() {
@@ -403,6 +404,43 @@
       }
     },
 
+    async fetchRepos() {
+      token = $('pat').value.trim();
+      if (!token) {
+        showToast('Please enter your GitHub PAT first', 'error');
+        return;
+      }
+      const btn = $('btn-fetch-repos');
+      const origHtml = btn.innerHTML;
+      setBtnLoading(btn, true);
+      try {
+        const res = await fetch('https://api.github.com/user/repos?per_page=100&sort=updated', {
+          headers: authHeaders()
+        });
+        if (!res.ok) throw new Error(`GitHub API error (${res.status})`);
+        repos = await res.json();
+
+        const sel = $('repo-select');
+        sel.innerHTML = '<option value="">Select a repository…</option>';
+        repos.forEach(r => {
+          const option = document.createElement('option');
+          option.value = r.full_name; // "owner/repo"
+          option.textContent = r.full_name + (r.private ? ' 🔒' : '');
+          sel.appendChild(option);
+        });
+
+        if (repos.length === 0) {
+          showToast('No repositories found for this account', 'error');
+        } else {
+          showToast(`Found ${repos.length} repositories`, 'success');
+        }
+      } catch (err) {
+        showToast('Failed to fetch repositories: ' + err.message, 'error');
+      } finally {
+        setBtnLoading(btn, false);
+      }
+    },
+
     logout() {
       clearState();
       showAuth();
@@ -524,6 +562,19 @@
     if ($('btn-logout')) $('btn-logout').addEventListener('click', () => window.app.logout());
     if ($('btn-refresh')) $('btn-refresh').addEventListener('click', () => window.app.refresh());
     if ($('pat')) $('pat').addEventListener('keypress', (e) => { if (e.key === 'Enter') window.app.connect(); });
+    if ($('repo-select')) {
+      $('repo-select').addEventListener('change', (e) => {
+        const full = e.target.value;
+        if (!full) return;
+        const parts = full.split('/');
+        if (parts.length === 2) {
+          $('config-owner').value = parts[0];
+          $('config-repo').value = parts[1];
+          cfg.owner = parts[0];
+          cfg.repo = parts[1];
+        }
+      });
+    }
     window.app.init();
   });
 })();

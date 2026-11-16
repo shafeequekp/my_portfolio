@@ -32,7 +32,19 @@
                 </div>
                 <hr class="my-3">
                 <div class="field-group">
-                    <span class="form-label-small">Repository</span>
+                    <span class="form-label-small">Select Repository</span>
+                    <div class="input-group">
+                        <select id="repo-select" class="form-select form-control-sm">
+                            <option value="">Select a repository…</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-fetch-repos" onclick="app.fetchRepos()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <div class="small text-muted mt-1">Enter your PAT above, then click the sync button to load your GitHub repositories.</div>
+                </div>
+                <div class="field-group">
+                    <span class="form-label-small">Or enter manually</span>
                     <input type="text" id="config-owner" class="form-control form-control-sm" placeholder="Owner (e.g. shafeequekp)">
                     <input type="text" id="config-repo" class="form-control form-control-sm mt-2" placeholder="Repo (e.g. my_portfolio)">
                     <input type="text" id="config-branch" class="form-control form-control-sm mt-2" placeholder="Branch (e.g. main)">
